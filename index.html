@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEE Library - Assessment Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #337ab7;
+            --secondary: #2d8c2d;
+            --bg: #f4f7f9;
+            --card: #ffffff;
+            --text: #333;
+            --border: #e0e0e0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+            padding: 50px 30px;
+            background: var(--card);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        }
+
+        .logo {
+            height: 100px;
+            width: auto;
+            margin-bottom: 25px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            margin-bottom: 45px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 650px) {
+            .grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2rem; }
+        }
+
+        .card-link {
+            text-decoration: none;
+            color: inherit;
+            padding: 40px 25px;
+            border: 2px solid var(--border);
+            border-radius: 15px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--card);
+        }
+
+        .card-link:hover {
+            border-color: var(--primary);
+            transform: translateY(-8px);
+            box-shadow: 0 10px 20px rgba(51, 122, 183, 0.1);
+            background: #fdfdfd;
+        }
+
+        .icon-circle {
+            width: 70px;
+            height: 70px;
+            background: #f0f7ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .card-link:hover .icon-circle {
+            background: var(--primary);
+            color: white;
+        }
+
+        .card-link h2 {
+            margin: 0 0 12px 0;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .details {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .badge {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #666;
+            background: #eee;
+            padding: 4px 12px;
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+
+        .full-test .badge { background: #e8f5e9; color: #2d8c2d; }
+        .single-subject .badge { background: #fff3e0; color: #e65100; }
+
+        footer {
+            margin-top: 50px;
+            font-size: 0.9rem;
+            opacity: 0.5;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <img src="logo.png" alt="JEE Library Logo" class="logo">
+        
+        <h1>JEE Assessment Portal</h1>
+        <p class="subtitle">Select your examination mode to launch the high-fidelity Computer Based Test (CBT) simulation.</p>
+
+        <div class="grid">
+            <a href="JEE MAINS .html" class="card-link full-test">
+                <div class="icon-circle">📜</div>
+                <h2>Full Mock Test</h2>
+                <div class="details">
+                    <span>Comprehensive 75-Question Paper</span>
+                    <span class="badge">180 Minutes (3 Hours)</span>
+                </div>
+            </a>
+
+            <a href="JEE MAINS - ONE SUBJECT.html" class="card-link single-subject">
+                <div class="icon-circle">🎯</div>
+                <h2>Single Subject</h2>
+                <div class="details">
+                    <span>Focused 25-Question Paper</span>
+                    <span class="badge">60 Minutes (1 Hour)</span>
+                </div>
+            </a>
+        </div>
+
+        <footer>
+            &copy; 2026 JEE Library Simulation Platform | Official Interface Design
+        </footer>
+    </div>
+
+</body>
+</html>
