@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEE Main 2026 Portal - Official Simulation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500&family=Segoe+UI:wght@400;600&display=swap" rel="stylesheet">
+    
+   <style>
+    :root {
+        --bg: #f4f7f9; --card: #ffffff; --text: #333333; --border: #dcdcdc;
+        --not-visited: #e0e0e0; --not-answered: #ee7c1a; --answered: #2d8c2d;
+        --review: #7b4f9d; --jee-blue: #337ab7; --timer-red: #d9534f;
+        --tab-bar-bg: #eeeeee;
+        --palette-bg: #f8f9fa;
+    }
+
+    body.dark-mode {
+        --bg: #121212; --card: #1e1e1e; --text: #f0f0f0; --border: #333333;
+        --not-visited: #2a2a2a; --jee-blue: #4a90e2;
+        --tab-bar-bg: #252525;
+        --palette-bg: #1a1a1a;
+    }
+
+    * { box-sizing: border-box; }
+    body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+    
+    .page { display: none; height: 100vh; width: 100vw; flex-direction: column; }
+    .page.active { display: flex; }
+
+    /* Start Page */
+    #start-page { align-items: center; justify-content: center; background-color: var(--bg); }
+    .intro-card { background: var(--card); padding: 50px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; max-width: 650px; width: 95%; }
+    .intro-title { color: var(--jee-blue); font-size: 2.2rem; margin-bottom: 10px; font-weight: 600; }
+    .intro-subtitle { color: var(--text); opacity: 0.7; font-size: 1.1rem; margin-bottom: 30px; }
+    .test-overview { background: var(--bg); padding: 25px; border-radius: 8px; text-align: left; margin-bottom: 35px; border: 1px solid var(--border); }
+    .test-overview h3 { margin-top: 0; font-size: 1rem; color: var(--text); }
+    .test-overview ul { list-style: none; padding: 0; margin: 0; }
+    .test-overview li { margin: 10px 0; color: var(--text); position: relative; padding-left: 15px; }
+    .test-overview li::before { content: "•"; position: absolute; left: 0; color: var(--jee-blue); }
+    .btn-start-test { background-color: #2d8c2d; color: white; padding: 15px 60px; border: none; border-radius: 5px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    
+    .subject-input { 
+        padding: 12px; 
+        width: 100%; 
+        margin-bottom: 20px; 
+        border: 1px solid #ccc; 
+        border-radius: 4px; 
+        font-size: 1rem;
+        background-color: #ffffff !important; 
+        color: #333333 !important;
+    }
+
+    /* Exam Interface */
+    .top-header { height: 65px; background: var(--card); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; padding: 0 25px; flex-shrink: 0; }
+    .timer-display { font-family: 'Roboto Mono', monospace; font-size: 1.6rem; font-weight: 600; color: var(--text); border: 1px solid var(--border); padding: 5px 15px; border-radius: 4px; background: var(--card); }
+    .timer-red { color: var(--timer-red) !important; border-color: var(--timer-red); animation: blink 1s infinite; }
+    @keyframes blink { 50% { opacity: 0.5; } }
+
+    .tab-bar { height: 50px; background: var(--tab-bar-bg); border-bottom: 1px solid var(--border); display: flex; padding: 5px 20px; gap: 5px; align-items: center; overflow-x: auto; flex-shrink: 0; }
+    .tab { padding: 8px 12px; border: 1px solid var(--border); cursor: pointer; font-size: 11px; border-radius: 3px; color: var(--text); background: var(--card); white-space: nowrap; text-transform: uppercase; }
+    .tab.active { background: var(--jee-blue); color: white; font-weight: bold; border-color: var(--jee-blue); }
+
+    .main-view { display: flex; flex: 1; overflow: hidden; }
+    .question-panel { flex: 1; display: flex; flex-direction: column; background: var(--card); border-right: 1px solid var(--border); }
+    .question-scroll { flex: 1; padding: 40px; overflow-y: auto; }
+    .palette-panel { width: 320px; background: var(--palette-bg); display: flex; flex-direction: column; flex-shrink: 0; }
+    .palette-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 15px; }
+
+    .q-btn { width: 45px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; background: var(--not-visited); position: relative; border: 1px solid var(--border); color: var(--text); }
+    .q-btn.active-q { outline: 2px solid var(--jee-blue); outline-offset: 2px; }
+    .q-btn.not-answered { background: var(--not-answered); color: white; border: none; clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%); }
+    .q-btn.answered { background: var(--answered); color: white; border: none; clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%); }
+    .q-btn.review { background: var(--review); color: white; border: none; border-radius: 50%; }
+    .q-btn.review-ans::after { content: "✓"; position: absolute; bottom: 0; right: 0; background: var(--answered); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; line-height: 16px; text-align: center; border: 1px solid white; }
+
+    .option-box { display: block; margin: 15px 0; padding: 18px; border: 1px solid var(--border); border-radius: 5px; cursor: pointer; background: var(--card); }
+    .btn-ui { padding: 10px 22px; border: 1px solid var(--border); cursor: pointer; border-radius: 4px; font-weight: 600; font-size: 13px; background: var(--card); color: var(--text); }
+    .btn-primary { background: var(--jee-blue); color: white; border: none; }
+    .btn-submit { background: var(--answered); color: white; padding: 12px; border: none; border-radius: 4px; width: 100%; font-weight: bold; cursor: pointer; }
+    .question-footer { height: 75px; border-top: 1px solid var(--border); padding: 0 30px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+
+    /* Numpad Styling */
+    .numpad-container { display: inline-block; background: var(--palette-bg); padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-top: 10px; }
+    .numpad-row { display: flex; gap: 5px; margin-bottom: 5px; }
+    .num-btn { width: 60px; height: 50px; font-size: 18px; font-weight: bold; cursor: pointer; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 4px; }
+    .num-btn:active { background: var(--jee-blue); color: white; }
+    .btn-clear-num { flex: 1; font-size: 14px; background: #f8f9fa; color: #333; }
+    body.dark-mode .btn-clear-num { background: #333; color: #fff; }
+</style>
+</head>
+<body>
+
+<div id="start-page" class="page active">
+    <div class="intro-card">
+        <img src="logo.png" alt="JEE Library Logo" style="height: 80px; width: auto; margin-bottom: 20px;">
+        
+        <div class="intro-title">JEE Main 2027 Portal</div>
+        <div class="intro-subtitle">Official Computer Based Test (CBT) Interface Simulation</div>
+        
+        <div class="test-overview">
+            <input type="text" id="subjectName" class="subject-input" placeholder="Enter Subject Name" value="Mathematics">
+            <h3>Test Overview:</h3>
+            <ul>
+                <li>Total Duration: 60 Minutes (1:00:00)</li>
+                <li>Total Questions: 25 (20 SCQ, 5 NUMERICALS)</li>
+                <li>You will be given a pdf at the end of the test upon submission</li>
+                <li>Progress is not saved between refreshes.</li>
+                <li>Orange Button represents an unanswered and viewed question</li>
+                <li>Green button respresents a answered question</li>
+                <li>Gray button represents Unviewed question.</li>
+                <li>Purple circle represents Marked For Review and if answered and marked for review, it will be counted for evaluation</li>
+
+            </ul>
+        </div>
+        <button class="btn-start-test" onclick="initTest()">START TEST</button>
+    </div>
+</div>
+<div id="exam-interface" class="page">
+    <div class="top-header">
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <img src="logo.png" alt="JEE Library Logo" style="height: 50px; width: auto;">
+        <div id="headerSubject" style="font-weight: bold; color: var(--jee-blue); font-size: 1.1rem; text-transform: uppercase;">JEE MAIN 2026 SIMULATION</div>
+    </div>
+    <div id="timer" class="timer-display">01:00:00</div>
+    <button class="btn-ui" onclick="document.body.classList.toggle('dark-mode')">🌓 THEME</button>
+</div>
+
+    <div class="tab-bar">
+        <div class="tab active" id="tab-1" onclick="jump(1)">Section A (SCQ 1-20)</div>
+        <div class="tab" id="tab-21" onclick="jump(21)">Section B (Num 21-25)</div>
+    </div>
+
+    <div class="main-view">
+        <div class="question-panel">
+            <div class="question-scroll">
+                <h2 id="qTitle" style="color: var(--jee-blue); margin-top: 0;">Question No. 1</h2>
+                <div id="qDisplay"></div>
+            </div>
+            <div class="question-footer">
+                <div>
+                    <button class="btn-ui" onclick="action('review')">Mark for Review & Next</button>
+                    <button class="btn-ui" onclick="action('clear')" style="margin-left: 10px;">Clear Response</button>
+                </div>
+                <button class="btn-ui btn-primary" onclick="action('save')">Save & Next</button>
+            </div>
+        </div>
+        <div class="palette-panel">
+            <div style="padding: 15px; font-weight: bold; border-bottom: 1px solid var(--border); font-size: 14px;" id="paletteTitle">Palette</div>
+            <div class="palette-grid" id="paletteGrid"></div>
+            <div style="margin-top: auto; padding: 20px; border-top: 1px solid var(--border);">
+                <button class="btn-submit" onclick="confirmSubmit()">SUBMIT TEST</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="thank-you" class="page" style="align-items: center; justify-content: center; text-align: center;">
+    <div class="intro-card">
+        <h1 style="color: var(--answered);">Test Submitted!</h1>
+        <p>Your PDF response sheet has been downloaded.</p>
+        <button class="btn-start-test" onclick="location.reload()">RETAKE TEST</button>
+    </div>
+</div>
+
+<script>
+    let curIdx = 1;
+    let timeLeft = 3600; 
+    let timerInterval;
+    let subjectName = "Subject";
+    
+    let state = {
+        ans: {},
+        status: {}
+    };
+
+    function initTest() {
+        subjectName = document.getElementById('subjectName').value || "Subject";
+        document.getElementById('headerSubject').innerText = subjectName.toUpperCase() + " SIMULATION";
+        document.getElementById('start-page').classList.remove('active');
+        document.getElementById('exam-interface').classList.add('active');
+        startTimer();
+        render();
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                finishTest(true); 
+                return;
+            }
+            timeLeft--;
+            const h = Math.floor(timeLeft / 3600);
+            const m = Math.floor((timeLeft % 3600) / 60);
+            const s = timeLeft % 60;
+            const timerEl = document.getElementById('timer');
+            timerEl.innerText = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            if (timeLeft <= 600) timerEl.classList.add('timer-red');
+        }, 1000);
+    }
+
+    function getSectionInfo(n) {
+        if (n <= 20) return { name: subjectName, type: "SCQ", start: 1, end: 20 };
+        return { name: subjectName, type: "Numerical", start: 21, end: 25 };
+    }
+
+    function jump(i) {
+        curIdx = i;
+        render();
+    }
+
+    function pressNum(val) {
+        let current = (state.ans[curIdx] || '').toString();
+        if (val === 'clear') {
+            current = '';
+        } else if (val === 'back') {
+            current = current.slice(0, -1);
+        } else {
+            if (val === '.' && current.includes('.')) return;
+            if (val === '-' && current.length > 0) return;
+            current += val;
+        }
+        state.ans[curIdx] = current;
+        document.getElementById('numInput').value = current;
+    }
+
+    function render() {
+        const info = getSectionInfo(curIdx);
+        if (!state.status[curIdx]) state.status[curIdx] = 1;
+
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(`tab-${info.start}`).classList.add('active');
+
+        document.getElementById('qTitle').innerText = `${info.name} (${info.type}) - Q.${curIdx}`;
+        document.getElementById('paletteTitle').innerText = `${info.name} Palette`;
+        
+        let html = '';
+        const saved = state.ans[curIdx] || '';
+
+        if (info.type === "SCQ") {
+            ['A','B','C','D'].forEach(o => {
+                html += `<label class="option-box"><input type="radio" name="opt" onchange="state.ans[${curIdx}]='${o}'" ${saved === o ? 'checked' : ''}> Option ${o}</label>`;
+            });
+        } else {
+            html = `
+                <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                    <p><b>Type Numerical Value:</b></p>
+                    <input type="text" id="numInput" class="btn-ui" style="width:250px; height:45px; font-size:18px; text-align:left; margin-bottom:5px; padding-left:15px;" value="${saved}" readonly>
+                    <div class="numpad-container">
+                        <div class="numpad-row">
+                            <button class="num-btn" onclick="pressNum('1')">1</button>
+                            <button class="num-btn" onclick="pressNum('2')">2</button>
+                            <button class="num-btn" onclick="pressNum('3')">3</button>
+                        </div>
+                        <div class="numpad-row">
+                            <button class="num-btn" onclick="pressNum('4')">4</button>
+                            <button class="num-btn" onclick="pressNum('5')">5</button>
+                            <button class="num-btn" onclick="pressNum('6')">6</button>
+                        </div>
+                        <div class="numpad-row">
+                            <button class="num-btn" onclick="pressNum('7')">7</button>
+                            <button class="num-btn" onclick="pressNum('8')">8</button>
+                            <button class="num-btn" onclick="pressNum('9')">9</button>
+                        </div>
+                        <div class="numpad-row">
+                            <button class="num-btn" onclick="pressNum('.')">.</button>
+                            <button class="num-btn" onclick="pressNum('0')">0</button>
+                            <button class="num-btn" onclick="pressNum('-')">-</button>
+                        </div>
+                        <div class="numpad-row">
+                            <button class="num-btn btn-clear-num" onclick="pressNum('back')">Back</button>
+                            <button class="num-btn btn-clear-num" onclick="pressNum('clear')">Clear</button>
+                        </div>
+                    </div>
+                </div>`;
+        }
+        document.getElementById('qDisplay').innerHTML = html;
+        updatePalette(info.start, info.end);
+    }
+
+    function updatePalette(start, end) {
+        let html = '';
+        for (let i = start; i <= end; i++) {
+            const s = state.status[i] || 0;
+            const cls = ['', 'not-answered', 'answered', 'review', 'review review-ans'][s];
+            html += `<div class="q-btn ${cls} ${i === curIdx ? 'active-q' : ''}" onclick="jump(${i})">${i}</div>`;
+        }
+        document.getElementById('paletteGrid').innerHTML = html;
+    }
+
+    function action(type) {
+        if (type === 'save') state.status[curIdx] = state.ans[curIdx] ? 2 : 1;
+        else if (type === 'review') state.status[curIdx] = state.ans[curIdx] ? 4 : 3;
+        else if (type === 'clear') { delete state.ans[curIdx]; state.status[curIdx] = 1; render(); return; }
+        
+        if (curIdx < 25) {
+            curIdx++;
+            render();
+        }
+    }
+
+    function confirmSubmit() {
+        if (confirm("Submit test and download response sheet?")) {
+            finishTest(false);
+        }
+    }
+
+    function finishTest(isAuto) {
+        if(isAuto) alert("Time Expired!");
+        clearInterval(timerInterval);
+        
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(16);
+        doc.text(`${subjectName.toUpperCase()} - RESPONSE SHEET`, 105, 15, { align: 'center' });
+        
+        let rows = [];
+        for (let i = 1; i <= 25; i++) {
+            const info = getSectionInfo(i);
+            rows.push([i, info.name, info.type, state.ans[i] || "---"]);
+        }
+
+        doc.autoTable({ startY: 25, head: [['Q#', 'Subject', 'Type', 'Answer']], body: rows, theme: 'grid' });
+        doc.save(`${subjectName}_Response_Sheet.pdf`);
+        
+        document.getElementById('exam-interface').classList.remove('active');
+        document.getElementById('thank-you').classList.add('active');
+    }
+</script>
+</body>
+</html>
